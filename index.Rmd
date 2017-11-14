@@ -1,0 +1,49 @@
+---
+title: "Concrete Plot"
+author: "Javier Angoy"
+date: "November 14, 2017"
+output: slidy_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Overview
+Concrete is the most important material in civil engineering. The concrete compressive strength is a highly nonlinear function of age and ingredients.
+	
+This document contains a plot for the [concrete](http://archive.ics.uci.edu/ml/datasets/Concrete+Compressive+Strength) data set. An overview for the data:
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(plotly)
+library(ggplot2)
+library(AppliedPredictiveModeling)
+data(concrete)
+str(concrete)
+```
+
+### Our Variables:
+
+>- Cement (component 1) -- quantitative -- kg in a m3 mixture
+>- Water (component 4) -- quantitative -- kg in a m3 mixture 
+>- Age -- quantitative -- Day (1~365)
+>- Concrete compressive strength -- quantitative -- MPa
+
+## Concrete Plot
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+dd <- transform(concrete, Age = ts(Age))
+
+df <- dd[order(factor(dd$Age)),]
+
+p <- ggplot(df, aes(Cement,CompressiveStrength)) +
+    geom_point(aes(frame = Age, colour=Water), size=6) + 
+    scale_colour_gradient(low = "white", high = "black") +
+    stat_smooth() 
+
+ggplotly(p, width = 1000, height = 800)  %>% 
+    
+layout(title = 'Cement versus Compressive Strenght Plot by Age (days). Colour: Water',
+       autosize = T, showlegend = T ) %>% 
+    animation_slider(currentvalue = list(prefix = "Age (days): ", font = list(color="red")))
+```
+
